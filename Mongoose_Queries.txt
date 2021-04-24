@@ -1,0 +1,91 @@
+Set up
+1. mongo
+2. npm i mongoose
+--
+Querying
+mongo
+use vampires
+--
+Select by comparison
+1. Find all the vampires that are females
+db.vampires.find({gender: 'f'})
+2. Have greater than 500 victims
+db.vampires.find({victims: {$gt: 500}})
+3. Have fewer than or equal to 150 victims 
+db.vampires.find({victims: {$lte: 150}})
+4. Have a victim count is not equal to 210234
+db.vampires.find({victims: {$ne: 210234}})
+5. Have greater than 150 and fewer than 500 victims
+db.vampires.find({$and: [{victims: {$gt: 150}},{victims: {$lt: 500}}]})
+
+Select by exist or does not exist
+1. Have a key of title 
+db.vampires.find({title: {$exists:true}})
+2. Do not have a key of 'victims'
+db.vampires.find({victims: {$exists: false}})
+3. Have a title AND no victims
+db.vampires.find({$and: [{title: {$exists: true}},{victims: {$exists: false}}]})
+4. Have victims, and the victims they have are greater than 1000
+db.vampires.find({$and: [{victims: {$exists: true}},{victims: {$gt: 1000}}]})
+
+Select with OR
+1. Are from New York, New York, US or New Orleans, Louisiana, US
+db.vampires.find({$or: [{location: 'New York, New York, US'},{location: 'New Orleans, Louisiana, US'}]})
+2. Love brooding or being tragic
+db.vampires.find({loves: {$in: ['brooding', 'being tragic']}})
+3. Have more than 100 victims or love marshmallows
+db.vampires.find({$or:[{victims: {$gt: 1000}},{loves: 'marshmallows'}]})
+4. Have red hair or green eyes
+db.vampires.find({$or:[{hair_color: 'red'},{eye_color: 'green'}]})
+
+Select objects that match one of several values
+1. Love either frilly shirtsleeves or frilly collars
+db.vampires.aggregate([{$match: {$or: [{loves: 'frilly shirtsleeves'},{loves: 'frilly collars'}]}}]).pretty()
+2. Love brooding
+db.vampires.aggregate([{$match: {loves: 'frilly shirtsleeves'}}]).pretty()
+3.love at least one of the following: appearing innocent, trickery, lurking in rotting mansions, R&B music
+db.vampires.aggregate([{$match: {loves: {$in:['appearing innocent','trickery','lurking in rotting mansions','R&B music']}}}]).pretty()
+4. love fancy cloaks but not if they also love either top hats or virgin blood
+ db.vampires.find({$and:[{loves:'fancy cloaks'},{loves:{$nin:['top hats', 'virgin blood']}}]})
+
+NAVIGATE SELECTION
+1. Loves ribbons but do not have brown eyes
+db.vampires.find({$and:[{loves: 'ribbons'},{eye_color:{$ne: 'brown'} }]})
+2. Are not from Rome
+db.vampires.find({location: {$nin: ['Rome, Italy']}})
+3. Do not love any of the following [fancy cloaks, frilly shirtsleeves, appearing innocent,
+being tragic, brooding]
+db.vampires.find({loves:{$nin:['fancy cloaks','frilly shirtsleeves','appearing innocent',
+'being tragic','brooding']}})
+4. Have not killed more than 200 people
+db.vampires.find({victims:{$lte: 200}})
+
+Replace
+1.Replace the vampire called 'Claudia' with a vampire called 'Eve'. 'Eve' will have a key called 'portrayed_by' with the value 'Tilda Swinton'
+db.vampires.replaceOne({name:'Claudia'},{name:'Eve'})
+db.vampires.updateOne({name: 'Eve'},{$set:{portrayed_by: 'Tilda Swinton'}})
+2. Replace the first male vampire with another whose name is 'Guy Man', and who has a key 'is_actually' with the value 'were-lizard'
+db.vampires.find({gender: 'm'})
+db.vampires.replaceOne({name: 'Count Chocula'},{name: 'Guy Man'})
+db.vampires.updateOne({name: 'Guy Man'},{$set:{is_Actually: 'Were-Lizard'}})
+
+Update
+1. Update 'Guy Man' to have a gender of 'f'
+db.vampires.updateOne({name: 'Guy Man'},{$set:{gender:'f'}})
+2. Update 'Eve' to have a gender of 'm'
+db.vampires.updateOne({name: 'Eve'},{$set: {gender: 'm'}})
+3. Update Guy Man to have an array called 'hates' that includes 'clothes' and 'jobs'
+db.vampires.updateOne({name: 'Guy Man'},{$set: {hates: ['alarm clocks','jackalopes']}})
+4. Rename Eve's name field to 'Moniker'
+db.vampires.updateOne({name: 'Eve'},{$set:{name: 'Moniker'}})
+5. We now no longer want to categorize female gender as 'f', but rather as fems.
+Update all females so that they have have the gender 'fems'
+db.vampires.updateMany({gender:'f'},{$set: {gender: 'fems'}})
+
+Remove
+1. Remove a single document wherein the hair_color is 'brown'
+db.vampires.remove({hair_color:'brown'},{justOne: true})
+2. We found out the the vampires with blue eyes were just fakes! Let's remove
+all the vampires who have blue eyes from our database
+db.vampires.remove({eye_color:'blue'})
+

@@ -36,12 +36,12 @@ Write Your Code Below
 //   gender: 'm',
 //   victims: 2
 // }
-//Commenting out to avoid uploading the data twice
-// Vampire.insertMany(seedData, (err, vampires) => {
-//   if (err) {console.log(err)}
-//   console.log("added provided vampire data", vampires)
-//   mongoose.connection.close();
-// });
+// Commenting out to avoid uploading the data twice
+Vampire.insertMany(seedData, (err, vampires) => {
+  if (err) {console.log(err)}
+  console.log("added provided vampire data", vampires)
+  mongoose.connection.close();
+});
 
 let michael = {
     name: 'King Michelangelo',
